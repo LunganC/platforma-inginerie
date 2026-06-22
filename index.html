@@ -206,7 +206,7 @@
 
     <script>
         // 🔴 INTRODUCE URL-UL WEB APP-ULUI TĂU DIN GOOGLE APPS SCRIPT AICI:
-        const webAppUrl = "https://script.google.com/a/macros/karcher.com/s/AKfycbyn2lT_WpTE_uDttGRMDfn6H1BDR90eQ2AokazbLgilsxWPoJzRKbF_DlrTYF2TQDfk/exec";
+        const webAppUrl = "https://script.google.com/a/macros/karcher.com/s/AKfycbykPDMDqRtgwyrgUTWcUuKJESObF2EdbqAYU75-pyPRqboLyvN4_8vQbl96t2zkmO9B/exec";
 
         let selectateIDs = [];
         let bazaDeDateCurenta = [];
@@ -337,7 +337,7 @@
             });
         }
 
-function trimiteEmailSelectate() {
+        function trimiteEmailSelectate() {
             if (selectateIDs.length === 0) {
                 alert("Selectați cel puțin o acțiune.");
                 return;
@@ -352,12 +352,10 @@ function trimiteEmailSelectate() {
             });
             let emailuriUnice = [...new Set(emailuri)];
             let corp = "Salutare,\r\n\r\nUrmătoarele acțiuni din platformă necesită atenția voastră:\r\n\r\n" + detalii + "\r\nO zi productivă!";
-            
-            // FIX DEFINITIV PENTRU ERORILE DE SINTAXĂ DIN JAVASCRIPT:
-            window.location.href = "mailto:" + emailuriUnice.join(";") + "?subject=Notificare Actiuni Engineering&body=" + encodeURIComponent(corp);
+            window.location.href = `mailto:${emailuriUnice.join(";")?subject=Notificare%20Actiuni%20Engineering&body=${encodeURIComponent(corp)}`;
         }
 
-function schimbaTema(numeTema) { document.documentElement.setAttribute('data-theme', numeTema); }
+        function schimbaTema(numeTema) { document.documentElement.setAttribute('data-theme', numeTema); }
     </script>
 </body>
 </html>
