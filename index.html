@@ -129,7 +129,7 @@
 
     <header>
         <div>
-            <h1>⚙️ DNA ENGINEERING // TASK CORE (CLOUD DATABASE)</h1>
+            <h1>⚙️ DNA ENGINEERING // TASK CORE (CLOUD GOOGLE SHEET)</h1>
         </div>
         <div class="config-panou">
             <button onclick="schimbaTema('dark')">⬛ Industrial Dark</button>
@@ -138,7 +138,7 @@
         </div>
     </header>
 
-    <div id="global-status">⏳ Se conectează la baza de date...</div>
+    <div id="global-status">⏳ Se conectează la baza de date Google Sheets...</div>
 
     <div class="workspace">
         <aside class="panou-formular">
@@ -189,16 +189,16 @@
                     <label>Observații / Riscuri:</label>
                     <textarea id="proj_observatii" rows="2" placeholder="Note adiționale..."></textarea>
                 </div>
-                <button type="submit" id="btnTrimitere" class="btn-actiune">⚡ Trimite în Baza de Date</button>
+                <button type="submit" id="btnTrimitere" class="btn-actiune">⚡ Trimite în Google Sheet</button>
             </form>
         </aside>
 
         <aside class="panou-tabel">
-            <h2>Registru Acțiuni active</h2>
+            <h2>Registru Acțiuni active (Sursa: Cloud Sheet)</h2>
             <div class="panou-controale-tabel">
                 <button class="btn-utilitar" onclick="selecteazaAutomatNefinalizate()">🔍 Selectează nefinalizate</button>
                 <button class="btn-utilitar" style="border-color: var(--danger); color: var(--danger)" onclick="trimiteEmailSelectate()">📧 Trimite e-mail (<span id="contorSelectate">0</span>)</button>
-                <button class="btn-utilitar" style="border-color: var(--accent); color: var(--accent)" onclick="incarcaDateDinCloud()">🔄 Refresh Bază Date</button>
+                <button class="btn-utilitar" style="border-color: var(--accent); color: var(--accent)" onclick="incarcaDateDinCloud()">🔄 Refresh Conexiune</button>
             </div>
             <div id="listaLoguri"></div>
         </aside>
@@ -206,7 +206,7 @@
 
     <script>
         // 🔴 INTRODUCE URL-UL WEB APP-ULUI TĂU DIN GOOGLE APPS SCRIPT AICI:
-        const webAppUrl = "https://script.google.com/a/macros/karcher.com/s/AKfycbykPDMDqRtgwyrgUTWcUuKJESObF2EdbqAYU75-pyPRqboLyvN4_8vQbl96t2zkmO9B/exec";
+        const webAppUrl = "https://script.google.com/a/macros/karcher.com/s/AKfycbxvQcqfSQP_SeKM9ktpKzqOBjN6EQu0z8jbGr3x5CiAUelcFER1R6EJBh3_TNvQQOtj/exec";
 
         let selectateIDs = [];
         let bazaDeDateCurenta = [];
@@ -215,31 +215,27 @@
             incarcaDateDinCloud();
         };
 
-        // CITIRE LIVE DIN GOOGLE SHEET VIA API
-// CITIRE LIVE DIN GOOGLE SHEET VIA API (Versiune cu urmărire redirect)
+        // CITIRE DATE LIVE DIN GOOGLE SHEET
         function incarcaDateDinCloud() {
             document.getElementById("global-status").innerHTML = "⏳ Se descarcă datele live din Google Sheet...";
             
-            // Adăugăm configurarea 'redirect: "follow"' pentru a permite browserului să urmărească răspunsul Google
             fetch(`${webAppUrl}?action=citeste`, {
                 method: "GET",
                 mode: "cors",
                 redirect: "follow"
             })
             .then(res => {
-                if (!res.ok) {
-                    throw new Error("Răspunsul rețelei nu a fost OK: " + res.status);
-                }
+                if (!res.ok) throw new Error("Eroare răspuns rețea.");
                 return res.json();
             })
             .then(date => {
-                bazaDeDateCurenta = date.reverse(); // Cele mai noi să fie sus
+                bazaDeDateCurenta = date.reverse(); // Proiectele noi vor apărea sus
                 afiseazaInregistrari();
                 document.getElementById("global-status").innerHTML = "<span style='color:#4ade80'>✓ Conexiune stabilă. Bază de date sincronizată!</span>";
             })
             .catch(err => {
-                console.error("Eroare detaliată fetch:", err);
-                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Eroare la sincronizarea bazei de date! Verificați consola browserului (F12).</span>";
+                console.error(err);
+                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Eroare conectare. Verificați URL-ul aplicației sau drepturile Google.</span>";
             });
         }
 
@@ -311,8 +307,7 @@
             afiseazaInregistrari();
         }
 
-        // SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
-// SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
+        // SCRIERE ÎN CLOUD LA SUBMIT FORMULAR
         function salveazaProiectInCloud(event) {
             event.preventDefault();
             
@@ -341,11 +336,11 @@
             .then(rezultat => {
                 if(rezultat.status === "succes") {
                     document.getElementById("formProiect").reset();
-                    incarcaDateDinCloud(); // Reîncarcă tabelul din cloud automat
+                    incarcaDateDinCloud(); // Reîncărcăm automat registrul local din Sheets
                 }
             })
             .catch(err => {
-                alert("Eroare la salvare! Verificați dacă datele s-au adăugat totuși în Excel.");
+                alert("Eroare la scriere! Verificați conexiunea la internet.");
             })
             .finally(() => {
                 btn.innerHTML = "⚡ Trimite în Baza de Date";
@@ -353,9 +348,10 @@
             });
         }
 
+        // EXPEDIERE EMAILURI CATRE CELE SELECTATE
         function trimiteEmailSelectate() {
             if (selectateIDs.length === 0) {
-                alert("Selectați cel puțin o acțiune.");
+                alert("Selectați manual sau automat cel puțin o acțiune pentru a genera notificarea.");
                 return;
             }
             let emailuri = [];
@@ -368,7 +364,7 @@
             });
             let emailuriUnice = [...new Set(emailuri)];
             let corp = "Salutare,\r\n\r\nUrmătoarele acțiuni din platformă necesită atenția voastră:\r\n\r\n" + detalii + "\r\nO zi productivă!";
-            window.location.href = `mailto:${emailuriUnice.join(";")?subject=Notificare%20Actiuni%20Engineering&body=${encodeURIComponent(corp)}`;
+            window.location.href = "mailto:" + emailuriUnice.join(";") + "?subject=Notificare Actiuni Engineering&body=" + encodeURIComponent(corp);
         }
 
         function schimbaTema(numeTema) { document.documentElement.setAttribute('data-theme', numeTema); }
