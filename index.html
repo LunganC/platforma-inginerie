@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DNA Engineering - Control Panel</title>
     <style>
-        /* --- CONFIGURARE TEME INDUSTRIALE (CSS Variables) --- */
+        /* --- CONFIGURARE TEME INDUSTRIALE --- */
         :root[data-theme="dark"] {
             --bg-principal: #0f172a;
             --bg-panouri: #1e293b;
@@ -78,7 +78,7 @@
         }
         .config-panou button:hover { border-color: var(--accent); }
 
-        .workspace { display: flex; gap: 20px; height: calc(100vh - 110px); }
+        .workspace { display: flex; gap: 20px; height: calc(100vh - 130px); }
 
         .panou-formular { flex: 1; background-color: var(--bg-panouri); border: 1px solid var(--Bordura); padding: 20px; overflow-y: auto; box-sizing: border-box; }
         .panou-tabel { flex: 2; background-color: var(--bg-panouri); border: 1px solid var(--Bordura); padding: 20px; overflow-y: auto; box-sizing: border-box; }
@@ -95,72 +95,21 @@
         [data-theme="light"] .btn-actiune { color: #ffffff; }
         .btn-actiune:hover { background-color: var(--accent-hover); }
 
-        /* --- PANOU UTILITARE --- */
-        .panou-controale-tabel {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .btn-utilitar {
-            background-color: var(--bg-input);
-            color: var(--text-principal);
-            border: 1px solid var(--Bordura);
-            padding: 8px 14px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-family: inherit;
-        }
+        .panou-controale-tabel { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-utilitar { background-color: var(--bg-input); color: var(--text-principal); border: 1px solid var(--Bordura); padding: 8px 14px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: inherit; }
         .btn-utilitar:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-utilitar.activat { background-color: var(--accent); color: #000000; border-color: var(--accent); }
-
-        /* --- CARDURI INTERACTIVE (SELECTIE MANUALĂ) --- */
-        .card-actiune { 
-            background-color: var(--bg-input); 
-            border: 1px solid var(--Bordura); 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            transition: all 0.2s ease;
-            cursor: pointer; /* Cursor de tip mână pentru a indica faptul că este clicabil */
-            user-select: none; /* Previne selectarea accidentală a textului la dublu-clic */
-        }
-        .card-actiune:hover {
-            border-color: var(--text-secundar);
-        }
-        /* Stil pentru starea selectată (Alertă Roșie Industrială) */
-        .card-actiune.selectat-manual { 
-            border-color: var(--danger); 
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
-            background-color: rgba(239, 68, 68, 0.02);
-        }
+        
+        .card-actiune { background-color: var(--bg-input); border: 1px solid var(--Bordura); padding: 15px; margin-bottom: 15px; transition: all 0.2s ease; cursor: pointer; user-select: none; }
+        .card-actiune:hover { border-color: var(--text-secundar); }
+        .card-actiune.selectat-manual { border-color: var(--danger); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
         
         .card-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--Bordura); padding-bottom: 6px; margin-bottom: 10px; align-items: center; }
         .card-id-zona { display: flex; align-items: center; gap: 10px; }
         .card-id { font-weight: bold; color: var(--accent); }
         
-        /* Checkbox-ul industrial vizual */
-        .selector-box {
-            width: 14px;
-            height: 14px;
-            border: 1px solid var(--Bordura);
-            display: inline-block;
-            background-color: var(--bg-principal);
-            position: relative;
-        }
-        .card-actiune.selectat-manual .selector-box {
-            background-color: var(--danger);
-            border-color: var(--danger);
-        }
-        .card-actiune.selectat-manual .selector-box::after {
-            content: "✓";
-            color: black;
-            font-size: 11px;
-            font-weight: bold;
-            position: absolute;
-            top: -2px;
-            left: 2px;
-        }
+        .selector-box { width: 14px; height: 14px; border: 1px solid var(--Bordura); display: inline-block; background-color: var(--bg-principal); position: relative; }
+        .card-actiune.selectat-manual .selector-box { background-color: var(--danger); border-color: var(--danger); }
+        .card-actiune.selectat-manual .selector-box::after { content: "✓"; color: black; font-size: 11px; font-weight: bold; position: absolute; top: -2px; left: 2px; }
 
         .card-termen { font-size: 11px; background-color: var(--Bordura); padding: 2px 6px; border-radius: 3px; }
         
@@ -172,14 +121,15 @@
 
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; margin-top: 10px; border-top: 1px dashed var(--Bordura); padding-top: 8px; }
         .meta-item span { color: var(--text-secundar); display: block; font-size: 10px; text-transform: uppercase; }
+        
+        #global-status { text-align: center; color: #f59e0b; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; }
     </style>
-    <script src="data.js"></script>
 </head>
 <body>
 
     <header>
         <div>
-            <h1>⚙️ ACTIUNII MENTENANTA // PROIECTE INGINERIE</h1>
+            <h1>⚙️ DNA ENGINEERING // TASK CORE (CLOUD DATABASE)</h1>
         </div>
         <div class="config-panou">
             <button onclick="schimbaTema('dark')">⬛ Industrial Dark</button>
@@ -188,21 +138,22 @@
         </div>
     </header>
 
+    <div id="global-status">⏳ Se conectează la baza de date...</div>
+
     <div class="workspace">
-        
         <aside class="panou-formular">
             <h2>Alocare Proiect Nou</h2>
-            <form id="formProiect" onsubmit="salveazaProiect(event)">
+            <form id="formProiect" onsubmit="salveazaProiectInCloud(event)">
                 <div class="form-group">
-                    <label>ID Proiect / Actiune:</label>
+                    <label>ID Proiect / Acțiune:</label>
                     <input type="text" id="proj_id" required placeholder="Ex: ENG-003">
                 </div>
                 <div class="form-group">
-                    <label>Actiune:</label>
+                    <label>Acțiune:</label>
                     <input type="text" id="proj_actiune" required placeholder="Denumire succintă">
                 </div>
                 <div class="form-group">
-                    <label>Descriere Detaliata:</label>
+                    <label>Descriere Detaliată:</label>
                     <textarea id="proj_descriere" rows="3" required placeholder="Detalii tehnice..."></textarea>
                 </div>
                 <div class="form-group">
@@ -217,16 +168,16 @@
                     <label>Sursa Înregistrării:</label>
                     <select id="proj_sursa">
                         <option value="Audit Intern">Audit Intern</option>
-                        <option value="Sesizare Schimb">Sedinta</option>
-                        <option value="Mentenanță Predictivă">Mentenantă Predictiva</option>
+                        <option value="Sesizare Schimb">Sesizare Schimb</option>
+                        <option value="Mentenanță Predictivă">Mentenanță Predictivă</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Status Proiect:</label>
                     <select id="proj_status">
                         <option value="Propus">Propus</option>
-                        <option value="În lucru">In lucru</option>
-                        <option value="Întârziat">Intarziat</option>
+                        <option value="În lucru">În lucru</option>
+                        <option value="Întârziat">Întârziat</option>
                         <option value="Finalizat">Finalizat</option>
                     </select>
                 </div>
@@ -235,39 +186,54 @@
                     <input type="date" id="proj_termen" required>
                 </div>
                 <div class="form-group">
-                    <label>Observatii / Riscuri:</label>
+                    <label>Observații / Riscuri:</label>
                     <textarea id="proj_observatii" rows="2" placeholder="Note adiționale..."></textarea>
                 </div>
-                <button type="submit" class="btn-actiune">⚡ Executa & Inregistreaza</button>
+                <button type="submit" id="btnTrimitere" class="btn-actiune">⚡ Trimite în Baza de Date</button>
             </form>
         </aside>
 
         <aside class="panou-tabel">
-            <h2>Registru Actiuni active</h2>
-            
+            <h2>Registru Acțiuni active</h2>
             <div class="panou-controale-tabel">
-                <button class="btn-utilitar" id="btnFiltruNefinalizate" onclick="selecteazaAutomatNefinalizate()">🔍 Selecteaza automat cele nefinalizate</button>
-                <button class="btn-utilitar" style="border-color: var(--danger); color: var(--danger)" onclick="trimiteEmailSelectate()">📧 Trimite e-mail pentru cele bifate (<span id="contorSelectate">0</span>)</button>
+                <button class="btn-utilitar" onclick="selecteazaAutomatNefinalizate()">🔍 Selectează nefinalizate</button>
+                <button class="btn-utilitar" style="border-color: var(--danger); color: var(--danger)" onclick="trimiteEmailSelectate()">📧 Trimite e-mail (<span id="contorSelectate">0</span>)</button>
+                <button class="btn-utilitar" style="border-color: var(--accent); color: var(--accent)" onclick="incarcaDateDinCloud()">🔄 Refresh Bază Date</button>
             </div>
-
             <div id="listaLoguri"></div>
         </aside>
-
     </div>
 
     <script>
-        // Tabloul global care va reține starea de selecție (ID-urile selectate)
+        // 🔴 INTRODUCE URL-UL WEB APP-ULUI TĂU DIN GOOGLE APPS SCRIPT AICI:
+        const webAppUrl = "https://script.google.com/a/macros/karcher.com/s/AKfycbyn2lT_WpTE_uDttGRMDfn6H1BDR90eQ2AokazbLgilsxWPoJzRKbF_DlrTYF2TQDfk/exec";
+
         let selectateIDs = [];
         let bazaDeDateCurenta = [];
 
         window.onload = function() {
-            if (typeof dateInitiale !== 'undefined') {
-                bazaDeDateCurenta = [...dateInitiale];
-            }
-            afiseazaInregistrari();
+            incarcaDateDinCloud();
         };
 
+        // CITIRE LIVE DIN GOOGLE SHEET VIA API
+        function incarcaDateDinCloud() {
+            document.getElementById("global-status").innerHTML = "⏳ Se descarcă datele live din Google Sheet...";
+            
+            fetch(`${webAppUrl}?action=citeste`)
+            .then(res => res.json())
+            .then(date => {
+                bazaDeDateCurenta = date.reverse(); // Cele mai noi să fie sus
+                afiseazaInregistrari();
+                document.getElementById("global-status").innerHTML = "<span style='color:#4ade80'>✓ Conexiune stabilă. Bază de date sincronizată!</span>";
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Eroare la sincronizarea bazei de date!</span>";
+            });
+        }
+
         function returneazaClasaStatus(status) {
+            if(!status) return 'status-propus';
             switch(status.toLowerCase().trim()) {
                 case 'propus': return 'status-propus';
                 case 'în lucru': case 'in lucru': return 'status-in-lucru';
@@ -282,16 +248,14 @@
             container.innerHTML = "";
 
             if (bazaDeDateCurenta.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-secundar); text-align: center;">Nicio acțiune înregistrată.</p>`;
+                container.innerHTML = `<p style="color: var(--text-secundar); text-align: center;">Nicio acțiune înregistrată în Google Sheet.</p>`;
                 return;
             }
 
             bazaDeDateCurenta.forEach(proiect => {
                 const esteSelectat = selectateIDs.includes(proiect.id);
-
                 const card = document.createElement("div");
                 card.className = `card-actiune ${esteSelectat ? 'selectat-manual' : ''}`;
-                // Atașăm funcția de toggle la clicul pe întregul card
                 card.onclick = function() { toggleSelectieCard(proiect.id); };
                 
                 card.innerHTML = `
@@ -316,94 +280,82 @@
                 `;
                 container.appendChild(card);
             });
-            
-            // Actualizăm numărul de pe butonul de trimitere e-mail
             document.getElementById("contorSelectate").innerText = selectateIDs.length;
         }
 
-        // MANAGEMENTUL SELECȚIEI MANUALE (La clic pe card)
         function toggleSelectieCard(id) {
             const pozitie = selectateIDs.indexOf(id);
-            if (pozitie > -1) {
-                // Dacă era deja selectat, îl scoatem din listă
-                selectateIDs.splice(pozitie, 1);
-            } else {
-                // Dacă nu era selectat, îl adăugăm
-                selectateIDs.push(id);
-            }
+            if (pozitie > -1) { selectateIDs.splice(pozitie, 1); } 
+            else { selectateIDs.push(id); }
             afiseazaInregistrari();
         }
 
-        // SELECȚIE AUTOMATĂ (Funcția extinsă)
         function selecteazaAutomatNefinalizate() {
-            selectateIDs = []; // Resetăm selecțiile vechi
-            
+            selectateIDs = [];
             bazaDeDateCurenta.forEach(p => {
-                if (p.status.toLowerCase().trim() !== 'finalizat') {
+                if (p.status && p.status.toLowerCase().trim() !== 'finalizat') {
                     selectateIDs.push(p.id);
                 }
             });
-            
             afiseazaInregistrari();
         }
 
-        // EMAIL AUTOMAT PENTRU TOATE CELE REȚINUTE ÎN "selectateIDs"
+        // SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
+        function salveazaProiectInCloud(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById("btnTrimitere");
+            btn.innerHTML = "⏳ Se salvează în cloud...";
+            btn.disabled = true;
+
+            const id = document.getElementById("proj_id").value.toUpperCase();
+            const actiune = document.getElementById("proj_actiune").value;
+            const descriere = document.getElementById("proj_descriere").value;
+            const responsabil = document.getElementById("proj_responsabil").value;
+            const manager = document.getElementById("proj_manager").value;
+            const sursa = document.getElementById("proj_sursa").value;
+            const status = document.getElementById("proj_status").value;
+            const termen = document.getElementById("proj_termen").value;
+            const observatii = document.getElementById("proj_observatii").value;
+
+            const urlParams = `?action=adauga&id=${encodeURIComponent(id)}&actiune=${encodeURIComponent(actiune)}&descriere=${encodeURIComponent(descriere)}&responsabil=${encodeURIComponent(responsabil)}&manager=${encodeURIComponent(manager)}&sursa=${encodeURIComponent(sursa)}&status=${encodeURIComponent(status)}&termen=${encodeURIComponent(termen)}&observatii=${encodeURIComponent(observatii)}`;
+
+            fetch(webAppUrl + urlParams)
+            .then(res => res.json())
+            .then(rezultat => {
+                if(rezultat.status === "succes") {
+                    document.getElementById("formProiect").reset();
+                    incarcaDateDinCloud(); // Reîncarcă tabelul din cloud automat
+                }
+            })
+            .catch(err => {
+                alert("Eroare la salvare! Verificați conexiunea.");
+            })
+            .finally(() => {
+                btn.innerHTML = "⚡ Trimite în Baza de Date";
+                btn.disabled = false;
+            });
+        }
+
         function trimiteEmailSelectate() {
             if (selectateIDs.length === 0) {
-                alert("Nu ai selectat nicio acțiune! Dă clic pe acțiunile din dreapta pentru a le bifa înainte de a trimite.");
+                alert("Selectați cel puțin o acțiune.");
                 return;
             }
-
-            let emailuriResponsabili = [];
-            let detaliiTaskuriRestante = "";
-
-            // Căutăm în baza de date doar proiectele care se regăsesc în lista de ID-uri selectate
+            let emailuri = [];
+            let detalii = "";
             bazaDeDateCurenta.forEach(p => {
                 if (selectateIDs.includes(p.id)) {
-                    emailuriResponsabili.push(p.responsabil.trim());
-                    detaliiTaskuriRestante += `- [${p.id}] ${p.actiune} (Status: ${p.status}, Termen: ${p.termen})\r\n`;
+                    emailuri.push(p.responsabil.trim());
+                    detalii += `- [${p.id}] ${p.actiune} (Termen: ${p.termen})\r\n`;
                 }
             });
-
-            // Înlăturăm eventualele duplicate din adresele de mail
-            let emailuriUnice = [...new Set(emailuriResponsabili)];
-            
-            const adreseDestinatari = emailuriUnice.join(";");
-            const subiectEmail = encodeURIComponent("DNA Engineering - Solicitare Status Acțiuni Alocate");
-            
-            let corpMesaj = "Salutare,\r\n\r\n";
-            corpMesaj += "Vă contactez în legătură cu următoarele acțiuni de inginerie selectate din platforma de control, ce necesită atenția voastră:\r\n\r\n";
-            corpMesaj += detaliiTaskuriRestante;
-            corpMesaj += "\r\nVă rugăm să asigurați suportul tehnic necesar și să actualizați stadiul lucrărilor.\r\n\r\nO zi productivă,\r\nEchipa DNA Engineering";
-            
-            const corpMesajAranjat = encodeURIComponent(corpMesaj);
-
-            // Deschide clientul local Windows de mail (Outlook)
-            window.location.href = `mailto:${adreseDestinatari}?subject=${subiectEmail}&body=${corpMesajAranjat}`;
+            let emailuriUnice = [...new Set(emailuri)];
+            let corp = "Salutare,\r\n\r\nUrmătoarele acțiuni din platformă necesită atenția voastră:\r\n\r\n" + detalii + "\r\nO zi productivă!";
+            window.location.href = `mailto:${emailuriUnice.join(";")?subject=Notificare%20Actiuni%20Engineering&body=${encodeURIComponent(corp)}`;
         }
 
-        function salveazaProiect(event) {
-            event.preventDefault();
-            const proiectNou = {
-                id: document.getElementById("proj_id").value.toUpperCase(),
-                actiune: document.getElementById("proj_actiune").value,
-                descriere: document.getElementById("proj_descriere").value,
-                responsabil: document.getElementById("proj_responsabil").value,
-                manager: document.getElementById("proj_manager").value,
-                sursa: document.getElementById("proj_sursa").value,
-                status: document.getElementById("proj_status").value,
-                termen: document.getElementById("proj_termen").value,
-                observatii: document.getElementById("proj_observatii").value
-            };
-
-            bazaDeDateCurenta.unshift(proiectNou);
-            afiseazaInregistrari();
-            document.getElementById("formProiect").reset();
-        }
-
-        function schimbaTema(numeTema) {
-            document.documentElement.setAttribute('data-theme', numeTema);
-        }
+        function schimbaTema(numeTema) { document.documentElement.setAttribute('data-theme', numeTema); }
     </script>
 </body>
 </html>
