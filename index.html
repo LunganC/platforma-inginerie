@@ -78,7 +78,7 @@
         }
         .config-panou button:hover { border-color: var(--accent); }
 
-        .workspace { display: flex; gap: 20px; height: calc(100vh - 130px); }
+        .workspace { display: flex; gap: 20px; height: calc(100vh - 110px); }
 
         .panou-formular { flex: 1; background-color: var(--bg-panouri); border: 1px solid var(--Bordura); padding: 20px; overflow-y: auto; box-sizing: border-box; }
         .panou-tabel { flex: 2; background-color: var(--bg-panouri); border: 1px solid var(--Bordura); padding: 20px; overflow-y: auto; box-sizing: border-box; }
@@ -122,14 +122,18 @@
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; margin-top: 10px; border-top: 1px dashed var(--Bordura); padding-top: 8px; }
         .meta-item span { color: var(--text-secundar); display: block; font-size: 10px; text-transform: uppercase; }
         
-        #global-status { text-align: center; color: #f59e0b; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; }
+        #global-status { text-align: center; color: #cbd5e1; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; }
+        
+        /* Buton special de descarcare JSON */
+        .btn-descarca-json { background-color: #22c55e !important; color: white !important; font-weight: bold; display: none; margin-top: 15px; text-align: center; width: 100%; padding: 12px; border: none; text-transform: uppercase; cursor: pointer; }
+        .btn-descarca-json:hover { background-color: #16a34a !important; }
     </style>
 </head>
 <body>
 
     <header>
         <div>
-            <h1>⚙️ DNA ENGINEERING // TASK CORE (CLOUD DATABASE)</h1>
+            <h1>⚙️ DNA ENGINEERING // TASK CORE (LOCAL JSON ENGINE)</h1>
         </div>
         <div class="config-panou">
             <button onclick="schimbaTema('dark')">⬛ Industrial Dark</button>
@@ -138,12 +142,12 @@
         </div>
     </header>
 
-    <div id="global-status">⏳ Se conectează la baza de date...</div>
+    <div id="global-status">⏳ Se încarcă registrul JSON local...</div>
 
     <div class="workspace">
         <aside class="panou-formular">
             <h2>Alocare Proiect Nou</h2>
-            <form id="formProiect" onsubmit="salveazaProiectInCloud(event)">
+            <form id="formProiect" onsubmit="proceseazaAdaugareLocal(event)">
                 <div class="form-group">
                     <label>ID Proiect / Acțiune:</label>
                     <input type="text" id="proj_id" required placeholder="Ex: ENG-003">
@@ -189,57 +193,46 @@
                     <label>Observații / Riscuri:</label>
                     <textarea id="proj_observatii" rows="2" placeholder="Note adiționale..."></textarea>
                 </div>
-                <button type="submit" id="btnTrimitere" class="btn-actiune">⚡ Trimite în Baza de Date</button>
+                <button type="submit" class="btn-actiune">⚡ Adaugă în listă</button>
             </form>
+            
+            <button id="btnDescarcaJson" class="btn-descarca-json" onclick="descarcaFisierJson()">💾 Salvează modificările în baza_date.json</button>
         </aside>
 
         <aside class="panou-tabel">
-            <h2>Registru Acțiuni active</h2>
+            <h2>Registru Acțiuni active (Sursa: baza_date.json)</h2>
             <div class="panou-controale-tabel">
                 <button class="btn-utilitar" onclick="selecteazaAutomatNefinalizate()">🔍 Selectează nefinalizate</button>
                 <button class="btn-utilitar" style="border-color: var(--danger); color: var(--danger)" onclick="trimiteEmailSelectate()">📧 Trimite e-mail (<span id="contorSelectate">0</span>)</button>
-                <button class="btn-utilitar" style="border-color: var(--accent); color: var(--accent)" onclick="incarcaDateDinCloud()">🔄 Refresh Bază Date</button>
             </div>
             <div id="listaLoguri"></div>
         </aside>
     </div>
 
     <script>
-        // 🔴 INTRODUCE URL-UL WEB APP-ULUI TĂU DIN GOOGLE APPS SCRIPT AICI:
-        const webAppUrl = "https://script.google.com/a/macros/karcher.com/s/AKfycbykPDMDqRtgwyrgUTWcUuKJESObF2EdbqAYU75-pyPRqboLyvN4_8vQbl96t2zkmO9B/exec";
-
         let selectateIDs = [];
         let bazaDeDateCurenta = [];
 
         window.onload = function() {
-            incarcaDateDinCloud();
+            incarcaDateDinJsonLocal();
         };
 
-        // CITIRE LIVE DIN GOOGLE SHEET VIA API
-// CITIRE LIVE DIN GOOGLE SHEET VIA API (Versiune cu urmărire redirect)
-        function incarcaDateDinCloud() {
-            document.getElementById("global-status").innerHTML = "⏳ Se descarcă datele live din Google Sheet...";
-            
-            // Adăugăm configurarea 'redirect: "follow"' pentru a permite browserului să urmărească răspunsul Google
-            fetch(`${webAppUrl}?action=citeste`, {
-                method: "GET",
-                mode: "cors",
-                redirect: "follow"
-            })
+        // CITIRE CITIRE AUTOMATĂ DIN FIȘIERUL JSON DE PE GITHUB (FĂRĂ CORS, E ÎN ACEEAȘI LOCAȚIE)
+        function incarcaDateDinJsonLocal() {
+            // Citim fișierul relativ "baza_date.json" local, garantat fără erori de securitate
+            fetch('baza_date.json', { cache: "no-store" })
             .then(res => {
-                if (!res.ok) {
-                    throw new Error("Răspunsul rețelei nu a fost OK: " + res.status);
-                }
+                if (!res.ok) throw new Error("Nu s-a putut găsi fișierul baza_date.json");
                 return res.json();
             })
             .then(date => {
-                bazaDeDateCurenta = date.reverse(); // Cele mai noi să fie sus
+                bazaDeDateCurenta = date;
                 afiseazaInregistrari();
-                document.getElementById("global-status").innerHTML = "<span style='color:#4ade80'>✓ Conexiune stabilă. Bază de date sincronizată!</span>";
+                document.getElementById("global-status").innerHTML = "<span style='color:#4ade80'>✓ Înregistrări preluate cu succes din baza_date.json!</span>";
             })
             .catch(err => {
-                console.error("Eroare detaliată fetch:", err);
-                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Eroare la sincronizarea bazei de date! Verificați consola browserului (F12).</span>";
+                console.error(err);
+                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Fișierul 'baza_date.json' lipsește sau este configurat greșit pe GitHub!</span>";
             });
         }
 
@@ -259,7 +252,7 @@
             container.innerHTML = "";
 
             if (bazaDeDateCurenta.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-secundar); text-align: center;">Nicio acțiune înregistrată în Google Sheet.</p>`;
+                container.innerHTML = `<p style="color: var(--text-secundar); text-align: center;">Nicio acțiune înregistrată.</p>`;
                 return;
             }
 
@@ -311,46 +304,49 @@
             afiseazaInregistrari();
         }
 
-        // SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
-// SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
-        function salveazaProiectInCloud(event) {
+        // ADĂUGARE LOCALĂ ȘI AFIȘARE DIRECTĂ PE ECRAN
+        function proceseazaAdaugareLocal(event) {
             event.preventDefault();
+
+            const proiectNou = {
+                id: document.getElementById("proj_id").value.toUpperCase(),
+                actiune: document.getElementById("proj_actiune").value,
+                descriere: document.getElementById("proj_descriere").value,
+                responsabil: document.getElementById("proj_responsabil").value,
+                manager: document.getElementById("proj_manager").value,
+                sursa: document.getElementById("proj_sursa").value,
+                status: document.getElementById("proj_status").value,
+                termen: document.getElementById("proj_termen").value,
+                observatii: document.getElementById("proj_observatii").value
+            };
+
+            // Adăugăm la începutul listei locale
+            bazaDeDateCurenta.unshift(proiectNou);
+            afiseazaInregistrari();
             
-            const btn = document.getElementById("btnTrimitere");
-            btn.innerHTML = "⏳ Se salvează în cloud...";
-            btn.disabled = true;
+            // Resetăm formularul
+            document.getElementById("formProiect").reset();
 
-            const id = document.getElementById("proj_id").value.toUpperCase();
-            const actiune = document.getElementById("proj_actiune").value;
-            const descriere = document.getElementById("proj_descriere").value;
-            const responsabil = document.getElementById("proj_responsabil").value;
-            const manager = document.getElementById("proj_manager").value;
-            const sursa = document.getElementById("proj_sursa").value;
-            const status = document.getElementById("proj_status").value;
-            const termen = document.getElementById("proj_termen").value;
-            const observatii = document.getElementById("proj_observatii").value;
+            // Afișăm butonul verde de descărcare a fișierului JSON actualizat
+            document.getElementById("btnDescarcaJson").style.display = "block";
+            document.getElementById("global-status").innerHTML = "<span style='color:#eab308'>⚠️ Listă actualizată pe ecran! Apasă butonul verde de mai jos pentru a descărca noul fișier JSON.</span>";
+        }
 
-            const urlParams = `?action=adauga&id=${encodeURIComponent(id)}&actiune=${encodeURIComponent(actiune)}&descriere=${encodeURIComponent(descriere)}&responsabil=${encodeURIComponent(responsabil)}&manager=${encodeURIComponent(manager)}&sursa=${encodeURIComponent(sursa)}&status=${encodeURIComponent(status)}&termen=${encodeURIComponent(termen)}&observatii=${encodeURIComponent(observatii)}`;
-
-            fetch(webAppUrl + urlParams, {
-                method: "GET",
-                mode: "cors",
-                redirect: "follow"
-            })
-            .then(res => res.json())
-            .then(rezultat => {
-                if(rezultat.status === "succes") {
-                    document.getElementById("formProiect").reset();
-                    incarcaDateDinCloud(); // Reîncarcă tabelul din cloud automat
-                }
-            })
-            .catch(err => {
-                alert("Eroare la salvare! Verificați dacă datele s-au adăugat totuși în Excel.");
-            })
-            .finally(() => {
-                btn.innerHTML = "⚡ Trimite în Baza de Date";
-                btn.disabled = false;
-            });
+        // DESCHIDE CASETA NATIIVĂ WINDOWS PENTRU SALVAREA FIȘIERULUI JSON ACTUALIZAT
+        function descarcaFisierJson() {
+            // Inversăm înapoi lista dacă vrem ca în fișier structura să rămână neschimbată chronologic
+            const textJson = JSON.stringify(bazaDeDateCurenta, null, 4);
+            
+            const blob = new Blob([textJson], { type: "application/json;charset=utf-8;" });
+            const link = document.createElement("a");
+            
+            link.href = URL.createObjectURL(blob);
+            link.download = "baza_date.json"; // Sugerează salvarea cu același nume exact
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            document.getElementById("global-status").innerHTML = "<span style='color:#4ade80'>✓ Fișierul baza_date.json a fost descărcat! Încarcă-l pe GitHub pentru a păstra modificările permanent.</span>";
         }
 
         function trimiteEmailSelectate() {
@@ -368,7 +364,7 @@
             });
             let emailuriUnice = [...new Set(emailuri)];
             let corp = "Salutare,\r\n\r\nUrmătoarele acțiuni din platformă necesită atenția voastră:\r\n\r\n" + detalii + "\r\nO zi productivă!";
-            window.location.href = `mailto:${emailuriUnice.join(";")?subject=Notificare%20Actiuni%20Engineering&body=${encodeURIComponent(corp)}`;
+            window.location.href = "mailto:" + emailuriUnice.join(";") + "?subject=Notificare Actiuni Engineering&body=" + encodeURIComponent(corp);
         }
 
         function schimbaTema(numeTema) { document.documentElement.setAttribute('data-theme', numeTema); }
