@@ -216,19 +216,30 @@
         };
 
         // CITIRE LIVE DIN GOOGLE SHEET VIA API
+// CITIRE LIVE DIN GOOGLE SHEET VIA API (Versiune cu urmărire redirect)
         function incarcaDateDinCloud() {
             document.getElementById("global-status").innerHTML = "⏳ Se descarcă datele live din Google Sheet...";
             
-            fetch(`${webAppUrl}?action=citeste`)
-            .then(res => res.json())
+            // Adăugăm configurarea 'redirect: "follow"' pentru a permite browserului să urmărească răspunsul Google
+            fetch(`${webAppUrl}?action=citeste`, {
+                method: "GET",
+                mode: "cors",
+                redirect: "follow"
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Răspunsul rețelei nu a fost OK: " + res.status);
+                }
+                return res.json();
+            })
             .then(date => {
                 bazaDeDateCurenta = date.reverse(); // Cele mai noi să fie sus
                 afiseazaInregistrari();
                 document.getElementById("global-status").innerHTML = "<span style='color:#4ade80'>✓ Conexiune stabilă. Bază de date sincronizată!</span>";
             })
             .catch(err => {
-                console.error(err);
-                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Eroare la sincronizarea bazei de date!</span>";
+                console.error("Eroare detaliată fetch:", err);
+                document.getElementById("global-status").innerHTML = "<span style='color:#ef4444'>⚠️ Eroare la sincronizarea bazei de date! Verificați consola browserului (F12).</span>";
             });
         }
 
@@ -301,6 +312,7 @@
         }
 
         // SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
+// SCRIERE DIRECTĂ ÎN CLOUD LA SUBMIT FORMULAR
         function salveazaProiectInCloud(event) {
             event.preventDefault();
             
@@ -320,7 +332,11 @@
 
             const urlParams = `?action=adauga&id=${encodeURIComponent(id)}&actiune=${encodeURIComponent(actiune)}&descriere=${encodeURIComponent(descriere)}&responsabil=${encodeURIComponent(responsabil)}&manager=${encodeURIComponent(manager)}&sursa=${encodeURIComponent(sursa)}&status=${encodeURIComponent(status)}&termen=${encodeURIComponent(termen)}&observatii=${encodeURIComponent(observatii)}`;
 
-            fetch(webAppUrl + urlParams)
+            fetch(webAppUrl + urlParams, {
+                method: "GET",
+                mode: "cors",
+                redirect: "follow"
+            })
             .then(res => res.json())
             .then(rezultat => {
                 if(rezultat.status === "succes") {
@@ -329,7 +345,7 @@
                 }
             })
             .catch(err => {
-                alert("Eroare la salvare! Verificați conexiunea.");
+                alert("Eroare la salvare! Verificați dacă datele s-au adăugat totuși în Excel.");
             })
             .finally(() => {
                 btn.innerHTML = "⚡ Trimite în Baza de Date";
